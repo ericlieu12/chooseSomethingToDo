@@ -1,13 +1,39 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import { useParams } from "react-router-dom";
+import { styled } from '@mui/material/styles';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import Backdrop from '@mui/material/Backdrop';
+import LobbyState0 from './LobbyState0';
+import LobbyState2 from './LobbyState2';
+import CircularProgress from '@mui/material/CircularProgress';
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+        backgroundColor: theme.palette.common.black,
+        color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.body}`]: {
+        fontSize: 14,
+    },
+}));
 const Lobby = (props) => {
     const [connection, setConnection] = useState(null);
-    const [users, setUsers] = useState('');
+    const [users, setUsers] = useState([]);
     const [user, setUser] = useState('');
-
-    const [message, setMessage] = useState('');
+    const [listings, setListings] = useState([]);
+    const [lobbyState, setLobbyState] = useState(0);
+    //0 = lobby fresh, no start yet
+    //1 = lobby started, fetch data from api
+    //2 = data ready from api
+    const [address, setAddress] = useState('3501 W Rolling Hills Circle, Davie, FL 33328');
     let params = useParams();
+
     const getOrCreateUser = async () => {
         let cookie = {};
         document.cookie.split(';').forEach(function (el) {
@@ -80,18 +106,35 @@ const Lobby = (props) => {
         if (connection) {
             connection.start()
                 .then(result => {
-                    
+
                     sendMessage();
                     console.log('Connected!');
 
-                    connection.on('ReceiveMessage', message => {
-                       console.log(message)
+                    connection.on('JoinedLobby', message => {
+                        setUsers(message)
+                        console.log(message)
+                    });
+                    connection.on('StartedLobby', message => {
+                        if (message == "not ready") {
+                            setLobbyState(1)
+                        }
+                    });
+                    connection.on('ReadyLobby', message => {
+                        console.log(message)
+                        setListings(message);
+                        setLobbyState(2);
+
+                    });
+                    connection.on('ChosenLocation', message => {
+                        console.log(message)
+                        
+
                     });
                 })
-                .catch(e => console.log('Connection failed: ', e));
-        }
+                        .catch(e => console.log('Connection failed: ', e));
+                }
+                    
     }, [connection]);
-
     const sendMessage = async () => {
         console.log(user)
         const chatMessage = {
@@ -111,12 +154,82 @@ const Lobby = (props) => {
             alert('No connection to server yet.');
         }
     }
+    const sendYesListing = async (value) => {
+        const yesMessage = {
+            UrlString: params.lobbyUrl,
+            UserId: user.id,
+            YelpListingId: value
+        };
+
+        if (connection._connectionStarted) {
+            try {
+                await connection.send('yesListing', yesMessage);
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }
+        else {
+            alert('No connection to server yet.');
+        }
+       
+    }
+    const startLobby = async () => {
+        
+        const startMessage = {
+            UrlString: params.lobbyUrl,
+            UserId: user.id,
+            Address: address
+        };
+
+        if (connection._connectionStarted) {
+            try {
+                await connection.send('StartLobby', startMessage);
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }
+        else {
+            alert('No connection to server yet.');
+        }
+    }
+    if (users.length == 0)
+        return (
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
+
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>)
+    if (lobbyState == 0)
+        return(<LobbyState0
+            startLobby={startLobby}
+            users={users}
+        />)
+    if (lobbyState == 1)
+        return (
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={true}
+
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>)
+    if (lobbyState == 2) {
+        return (
+            <LobbyState2
+                connection={connection}
+            listings={listings}
+            sendYesListing={sendYesListing}
+        />)
+    }
     return (
-     
-        <div>
-            <button onClick={() => sendMessage()}> AA </button>
-            Hello
-            </div>
+        <LobbyState0
+            startLobby={startLobby}
+            users={users}
+        />
     )
 };
 

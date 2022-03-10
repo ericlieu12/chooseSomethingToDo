@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using chooseSomethingToDo.Database;
 
@@ -11,9 +12,10 @@ using chooseSomethingToDo.Database;
 namespace chooseSomethingToDo.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220309203911_yelpListing")]
+    partial class yelpListing
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,9 +35,6 @@ namespace chooseSomethingToDo.Migrations
                     b.Property<string>("UrlString")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("isStarted")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -60,14 +59,9 @@ namespace chooseSomethingToDo.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("YelpListingId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("LobbyId");
-
-                    b.HasIndex("YelpListingId");
 
                     b.ToTable("Users");
                 });
@@ -161,10 +155,6 @@ namespace chooseSomethingToDo.Migrations
                     b.HasOne("chooseSomethingToDo.DBModels.Lobby", null)
                         .WithMany("users")
                         .HasForeignKey("LobbyId");
-
-                    b.HasOne("chooseSomethingToDo.DBModels.YelpListing", null)
-                        .WithMany("users")
-                        .HasForeignKey("YelpListingId");
                 });
 
             modelBuilder.Entity("chooseSomethingToDo.DBModels.YelpListing", b =>
@@ -179,11 +169,6 @@ namespace chooseSomethingToDo.Migrations
                     b.Navigation("users");
 
                     b.Navigation("yelpListings");
-                });
-
-            modelBuilder.Entity("chooseSomethingToDo.DBModels.YelpListing", b =>
-                {
-                    b.Navigation("users");
                 });
 #pragma warning restore 612, 618
         }

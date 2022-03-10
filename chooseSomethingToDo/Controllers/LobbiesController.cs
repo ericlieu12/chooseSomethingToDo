@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using chooseSomethingToDo.Database;
-using chooseSomethingToDo.Models;
+using chooseSomethingToDo.DBModels;
 using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.SignalR;
 using chooseSomethingToDo.Hubs;
@@ -104,7 +104,7 @@ namespace chooseSomethingToDo.Controllers
                 user.IsLeader = true;
 
                 lobby.users.Add(user);
-
+                lobby.isStarted = false;
                 _context.Lobbys.Add(lobby);
 
 
@@ -120,32 +120,7 @@ namespace chooseSomethingToDo.Controllers
         }
 
        
-        [HttpPost]
-        [Route("api/joinLobby")]
-        public async Task<ActionResult<Lobby>> JoinLobby()
-        {
-            try
-            {
-                Lobby lobby = new Lobby();
-                lobby.UrlString = "123456";
-                lobby.users = new List<User>();
-
-                User user = new User();
-                user.Name = "Test1";
-                user.IsLeader = true;
-
-                lobby.users.Add(user);
-                _context.Lobbys.Add(lobby);
-                await _context.SaveChangesAsync();
-
-                return CreatedAtAction("CreateLobby", lobby);
-            }
-            catch (Exception ex)
-            {
-                return NotFound();
-            }
-            
-        }
+       
 
 
 

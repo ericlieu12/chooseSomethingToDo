@@ -1,6 +1,6 @@
 
 using chooseSomethingToDo.Hubs;
-using chooseSomethingToDo.Models;
+using chooseSomethingToDo.DBModels;
 using chooseSomethingToDo.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Cors;
@@ -26,7 +26,7 @@ builder.Services.AddCors(options =>
 
 
 var app = builder.Build();
-//app.UseCors("ClientPermission");
+app.UseCors("ClientPermission");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

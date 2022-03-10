@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using chooseSomethingToDo.Database;
-using chooseSomethingToDo.Models;
+using chooseSomethingToDo.DBModels;
 
 namespace chooseSomethingToDo.Controllers
 {

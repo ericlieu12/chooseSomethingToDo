@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace chooseSomethingToDo.Models
+namespace chooseSomethingToDo.DBModels
 {
     public class User
     {
