@@ -90,16 +90,21 @@ namespace chooseSomethingToDo.Hubs
                             var location = business["location"];
                             var address = location["address"];
                             var categories = business["categories"];
+                            var transactions = business["transactions"];
                             YelpListing listing = new YelpListing();
 
                             var categoryString = "";
                             foreach (JObject category in categories)
                             {
-                                categoryString += (string)category["title"];
+                                categoryString = categoryString + (string)category["title"] + ",";
                             }
                             listing.categoryTitleString = categoryString;
 
-
+                            var transactionsString = "";
+                            foreach (String transaction in transactions)
+                            {
+                                transactionsString = transactionsString + transaction + ",";
+                            }
                             listing.city = (string)location["city"];
                             listing.country = (string)location["country"];
                             listing.state = (string)location["state"];
@@ -114,7 +119,7 @@ namespace chooseSomethingToDo.Hubs
                             listing.yelpID = (string)business["id"];
                             listing.yelpURL = (string)business["url"];
                             listing.alias = "";
-                            listing.transactionsString = "";
+                            listing.transactionsString = transactionsString;
                             listing.imageURL = (string)business["image_url"];
                             listing.distance = (string)business["distance"];
                             lobby.yelpListings.Add(listing);
@@ -167,7 +172,7 @@ namespace chooseSomethingToDo.Hubs
                 await _context.SaveChangesAsync();
                 if (lobby.yelpListings[message.YelpListingId].users.Count == lobby.users.Count)
                 {
-                    await Clients.Group(message.UrlString).SendAsync("ChosenLocation", lobby.yelpListings[message.YelpListingId].name);
+                    await Clients.Group(message.UrlString).SendAsync("ChosenLocation", lobby.yelpListings[message.YelpListingId]);
                 }
                 
             }

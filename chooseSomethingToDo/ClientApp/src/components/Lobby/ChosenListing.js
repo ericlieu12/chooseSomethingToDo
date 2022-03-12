@@ -28,22 +28,22 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     },
 }));
 
-const Listing = (props) => {
+const ChosenListing = (props) => {
 
-    const { yesAnswer, noAnswer, listing } = props;
+    const { listing } = props;
     const categories = listing.categoryTitleString.split(",");
     const transactions = listing.transactionsString.split(",");
     categories.pop()
     transactions.pop()
     return (
-        <Card sx={{width: 300}}>
+        <Card sx={{ width: 300 }}>
             <CardMedia
                 component="img"
                 height="200"
                 width="300"
                 image={listing.imageURL}
                 alt="green iguana"
-                style={{objectFit: 'cover'}}
+                style={{ objectFit: 'cover' }}
             />
             <CardContent>
                 <Typography variant="h5">
@@ -52,21 +52,21 @@ const Listing = (props) => {
                 <Typography variant="body2" sx={{ mb: 0.5 }} color="text.secondary">
                     {listing.addressString}, {listing.city}, {listing.state} {listing.zipCode}
                 </Typography>
-              
+
                 <Stack direction="row" spacing={2} sx={{ mb: 1 }}>
-                    
+
                     <YelpStar rating={listing.rating} />
                     <Typography align="center" variant="body2" color="text.secondary">
                         {listing.reviewCount} reviews
                     </Typography>
-                    </Stack>
-               
-                   
-                
-               
-               
+                </Stack>
+
+
+
+
+
                 {categories.map((category) => (
-                   
+
                     <Chip sx={{ mb: 1 }} label={category} />
 
                 ))}
@@ -77,14 +77,14 @@ const Listing = (props) => {
 
                 {/*))}*/}
 
-                
+
             </CardContent>
-            <CardActions sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}} >
-                <Button size="small" variant="contained" onClick={() => yesAnswer()} >No</Button>
-                <Button align="right" size="small" variant="contained" onClick={() => noAnswer()} >Yes</Button>
+            <CardActions sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }} >
+                <Button size="small" variant="contained"  >No</Button>
+                <Button align="right" size="small" variant="contained"  >Yes</Button>
             </CardActions>
         </Card>
     )
 };
 
-export default Listing;
+export default ChosenListing;

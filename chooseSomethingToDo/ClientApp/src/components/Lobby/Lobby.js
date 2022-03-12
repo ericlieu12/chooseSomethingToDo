@@ -12,6 +12,7 @@ import Paper from '@mui/material/Paper';
 import Backdrop from '@mui/material/Backdrop';
 import LobbyState0 from './LobbyState0';
 import LobbyState2 from './LobbyState2';
+import LobbyState3 from './LobbyState3';
 import CircularProgress from '@mui/material/CircularProgress';
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -28,6 +29,7 @@ const Lobby = (props) => {
     const [user, setUser] = useState('');
     const [listings, setListings] = useState([]);
     const [lobbyState, setLobbyState] = useState(0);
+    const [chosen, setChosen] = useState('');
     //0 = lobby fresh, no start yet
     //1 = lobby started, fetch data from api
     //2 = data ready from api
@@ -126,7 +128,9 @@ const Lobby = (props) => {
 
                     });
                     connection.on('ChosenLocation', message => {
-                        console.log(message)
+                        setChosen(message)
+                        setLobbyState(3);
+                        
                         
 
                     });
@@ -207,6 +211,7 @@ const Lobby = (props) => {
         return(<LobbyState0
             startLobby={startLobby}
             users={users}
+            address={address}
         />)
     if (lobbyState == 1)
         return (
@@ -225,10 +230,19 @@ const Lobby = (props) => {
             sendYesListing={sendYesListing}
         />)
     }
+    if (lobbyState == 3) {
+        return (
+            <LobbyState3
+                users={users}
+                chosen={chosen}
+
+            />)
+    }
     return (
         <LobbyState0
             startLobby={startLobby}
             users={users}
+            address={address}
         />
     )
 };

@@ -6,8 +6,17 @@ import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-
+import UserCard from './UserCard.js';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import Grid from '@mui/material/Grid';
+import EditIcon from '@mui/icons-material/Edit';
+import IconButton from '@material-ui/core/IconButton';
+import Checkbox from '@mui/material/Checkbox';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: theme.palette.common.black,
@@ -23,27 +32,72 @@ const LobbyState0 = (props) => {
 
 
     return (
-        <TableContainer sx={{ maxWidth: 300 }} component={Paper}>
-            <Table aria-label="customized table">
-                <TableHead>
-                    <TableRow>
-                        <StyledTableCell>Name</StyledTableCell>
 
+        <Grid container spacing={2}>
+            <Grid item xs={8}>
+                <Typography variant="h5" align="center" component="div">
+                    PLAYERS
+                </Typography>
+                </Grid>
+            <Grid item xs={4}>
+                <Typography variant="h5" align="center" component="div">
+                    SETTINGS
+                </Typography>
+            </Grid>
+            <Grid item xs={8}>
+                
+                <Grid container spacing={2}>
+            {users.map((user) => (
+                        <Grid item xs={3}>
+                    <UserCard name={user.name} key={user.id} />
 
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {users.map((user) => (
-                        <TableRow key={user.id}>
-                            <StyledTableCell>{user.name}</StyledTableCell>
+        </Grid>
+                         
 
+            ))}
+                    <Grid item xs={3}>
+                        <UserCard name="test" key="5" />
 
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-            <button onClick={() => startLobby()}> StartLobby </button>
-        </TableContainer>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <UserCard name="test" key="5" />
+
+                    </Grid>
+                    <Grid item xs={3}>
+                        <UserCard name="test" key="5" />
+
+                    </Grid>
+                    <Grid item xs={3}>
+                        <UserCard name="test" key="5" />
+
+                    </Grid>
+                    </Grid>
+                </Grid>
+            <Grid item xs={4}>
+                <Stack direction='row'>
+                <Typography gutterBottom  sx={{ mb: 1.5 }} variant="body2" >
+                    Location: {props.address}
+                    </Typography>
+                    <IconButton>
+                        <EditIcon />
+                    </IconButton>
+                    </Stack>
+                <FormGroup>
+                    <FormControlLabel control={<Checkbox defaultChecked />} labelPlacement="start" label="Active Life" />
+                    <FormControlLabel control={<Checkbox defaultChecked />} labelPlacement="start" label="Arts & Entertainment" />
+                    <FormControlLabel control={<Checkbox defaultChecked />} labelPlacement="start" label="Automotive" />
+                    <FormControlLabel control={<Checkbox defaultChecked />} labelPlacement="start" label="Beauty & Spas" />
+        
+                    <FormControlLabel disabled control={<Checkbox />} labelPlacement="start" label="Food" />
+                    <FormControlLabel disabled control={<Checkbox />} labelPlacement="start" label="Nightlife " />
+                    <FormControlLabel disabled control={<Checkbox />} labelPlacement="start" label="Restaurants" />
+                </FormGroup>
+              
+            </Grid>
+          
+        </Grid>
+          
+              
     )
 };
 

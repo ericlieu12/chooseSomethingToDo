@@ -8,6 +8,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Listing from './Listing';
+import UserListState2 from './UserListState2';
+import Grid from '@mui/material/Grid';
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: theme.palette.common.black,
@@ -30,7 +32,20 @@ const LobbyState2 = (props) => {
         setListingID(listingID + 1)
     }
     return (
-        <Listing listing={listings[listingID]} yesAnswer={yesAnswer} noAnswer={noAnswer} />
+        <Grid container spacing={2} sx={{height: 'calc (100vh-64px)'}}>
+            <Grid item xs={4}>
+            
+            </Grid>
+            <Grid item xs={4}>
+               
+                <Listing listing={listings[listingID]} yesAnswer={yesAnswer} noAnswer={noAnswer} />
+               
+            </Grid>
+            <Grid item xs={4}>
+
+            </Grid>
+            </Grid>
+       
     )
 };
 
