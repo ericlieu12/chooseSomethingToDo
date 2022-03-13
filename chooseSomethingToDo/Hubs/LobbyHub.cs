@@ -25,20 +25,31 @@ namespace chooseSomethingToDo.Hubs
         {
             
             Lobby lobby = await _context.Lobbys.Include(x => x.users).FirstAsync(m => m.UrlString == message.UrlString);
+            
             await Groups.AddToGroupAsync(Context.ConnectionId, message.UrlString);
-            User user = await _context.Users.FirstAsync(m => m.Id == message.UserId);
-            if (user.IsLeader)
+            if (lobby.isStarted)
             {
-
+                //lobby started, so error it up
+                Clients.Client(Context.ConnectionId).SendAsync("ErrorConnection");
             }
             else
             {
-                //because they are not automatically added
-                lobby.users.Add(user);
-            }
+                User user = await _context.Users.FirstAsync(m => m.Id == message.UserId);
+                user.ConnectionID = Context.ConnectionId;
+                if (user.IsLeader)
+                {
 
-            await _context.SaveChangesAsync();
-            await Clients.Group(message.UrlString).SendAsync("JoinedLobby", lobby.users);
+                }
+                else
+                {
+                    //because they are not automatically added
+                    lobby.users.Add(user);
+                }
+
+                await _context.SaveChangesAsync();
+                await Clients.Group(message.UrlString).SendAsync("JoinedLobby", lobby.users);
+            }
+            
         }
 
         public async Task StartLobby(StartMessage message)
@@ -70,8 +81,28 @@ namespace chooseSomethingToDo.Hubs
                     using (HttpClient client = new HttpClient())
                     {
                         var uri = "https://api.yelp.com/v3/businesses/search";
-                        var requesturi = QueryHelpers.AddQueryString(uri, "location", message.Address);
-                        var req = new HttpRequestMessage(HttpMethod.Get, requesturi);
+                        uri = QueryHelpers.AddQueryString(uri, "location", message.Address);
+                        if (message.Price == 1)
+                        {
+                            uri = QueryHelpers.AddQueryString(uri, "price", "1");
+                        }
+                        if (message.Price == 2)
+                        {
+                            uri = QueryHelpers.AddQueryString(uri, "price", "1,2");
+                        }
+                        if (message.Price == 3)
+                        {
+                            uri = QueryHelpers.AddQueryString(uri, "price", "1,2,3");
+                        }
+                        if (message.Price == 4)
+                        {
+                            uri = QueryHelpers.AddQueryString(uri, "price", "1,2,3,4");
+                        }
+                       
+                        uri = QueryHelpers.AddQueryString(uri, "open_now", message.Open.ToString());
+                        uri = QueryHelpers.AddQueryString(uri, "categories", message.Categories);
+                        uri = QueryHelpers.AddQueryString(uri, "radius", message.Distance.ToString());
+                        var req = new HttpRequestMessage(HttpMethod.Get, uri);
 
                         req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", APIKey);
                         // This is the important part:
@@ -128,6 +159,7 @@ namespace chooseSomethingToDo.Hubs
                         }
                         try
                         {
+                            lobby.isStarted = true;
                             await _context.SaveChangesAsync();
                         }
                         catch (Exception ex)
@@ -174,6 +206,22 @@ namespace chooseSomethingToDo.Hubs
                 {
                     await Clients.Group(message.UrlString).SendAsync("ChosenLocation", lobby.yelpListings[message.YelpListingId]);
                 }
+                if ((message.YelpListingId + 1) == lobby.yelpListings.Count)
+                {
+                    int maxCountIndex = 0;
+                    int maxCount = 0;
+                    int index = 0;
+                    foreach(YelpListing listing in lobby.yelpListings)
+                    {
+                        if (listing.users.Count > maxCount)
+                        {
+                            maxCountIndex = index;
+                            maxCount = listing.users.Count;
+                        }
+                        index++;
+                    }
+                    await Clients.Group(message.UrlString).SendAsync("ChosenLocation", lobby.yelpListings[maxCountIndex]);
+                }
                 
             }
             catch (Exception ex)
@@ -185,6 +233,20 @@ namespace chooseSomethingToDo.Hubs
 
 
         }
+        public override async Task OnDisconnectedAsync(Exception? ex)
+        {
+            // Add your own code here.
+            // For example: in a chat application, mark the user as offline, 
+            // delete the association between the current connection id and user name.
+            User user = await _context.Users.FirstAsync(m => m.ConnectionID == Context.ConnectionId);
+            Lobby lobby = await _context.Lobbys.Include(x => x.users).FirstAsync(m => m.Id == user.LobbyId);
+
+            lobby.users.Remove(user);
+            await _context.SaveChangesAsync();
+            await Clients.Group(lobby.UrlString).SendAsync("JoinedLobby", lobby.users);
+           
+        }
+
         public async Task SendMessage(StartMessage message)
         {
             await Clients.All.SendAsync("ReceiveMessage", message);

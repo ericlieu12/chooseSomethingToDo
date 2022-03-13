@@ -102,7 +102,7 @@ namespace chooseSomethingToDo.Controllers
                 User user = new User();
                 user.Name = name;
                 user.IsLeader = true;
-
+                
                 lobby.users.Add(user);
                 lobby.isStarted = false;
                 _context.Lobbys.Add(lobby);

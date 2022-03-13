@@ -27,15 +27,22 @@ const Lobby = (props) => {
     const [connection, setConnection] = useState(null);
     const [users, setUsers] = useState([]);
     const [user, setUser] = useState('');
+
+    
     const [listings, setListings] = useState([]);
     const [lobbyState, setLobbyState] = useState(0);
-    const [chosen, setChosen] = useState('');
-    //0 = lobby fresh, no start yet
+   
+    let params = useParams();
+     //0 = lobby fresh, no start yet
     //1 = lobby started, fetch data from api
     //2 = data ready from api
-    const [address, setAddress] = useState('3501 W Rolling Hills Circle, Davie, FL 33328');
-    let params = useParams();
+    const [chosen, setChosen] = useState('');
 
+    const disconnectUser = () => {
+        if (connection) {
+
+        }
+    }
     const getOrCreateUser = async () => {
         let cookie = {};
         document.cookie.split(';').forEach(function (el) {
@@ -91,7 +98,7 @@ const Lobby = (props) => {
        
     };
     useEffect(() => {
-       
+      
         getOrCreateUser()
         
     }, []);
@@ -132,6 +139,11 @@ const Lobby = (props) => {
                         setLobbyState(3);
                         
                         
+
+                    });
+                    connection.on('ErrorConnection', message => {
+                        alert("Error, lobby may have started or you have been kicked. Click the back button or leave the website.")
+
 
                     });
                 })
@@ -178,12 +190,19 @@ const Lobby = (props) => {
         }
        
     }
-    const startLobby = async () => {
-        
+    const startLobby = async (distance, openNow, categoriesString, price, address) => {
+        const miles = distance * 1609.34
+        if (miles > 40000) {
+            miles = 40000
+        }
         const startMessage = {
             UrlString: params.lobbyUrl,
             UserId: user.id,
-            Address: address
+            Address: address,
+            Distance: miles | 0 ,
+            Categories: categoriesString,
+            Price: price,
+            Open: openNow
         };
 
         if (connection._connectionStarted) {
@@ -211,7 +230,7 @@ const Lobby = (props) => {
         return(<LobbyState0
             startLobby={startLobby}
             users={users}
-            address={address}
+           
         />)
     if (lobbyState == 1)
         return (
@@ -242,7 +261,8 @@ const Lobby = (props) => {
         <LobbyState0
             startLobby={startLobby}
             users={users}
-            address={address}
+            
+            
         />
     )
 };

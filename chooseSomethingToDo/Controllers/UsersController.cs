@@ -83,7 +83,7 @@ namespace chooseSomethingToDo.Controllers
                 User user = new User();
                 user.Name = name;
                 user.IsLeader = false;
-
+                
 
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
