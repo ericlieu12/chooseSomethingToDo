@@ -10,7 +10,7 @@ namespace chooseSomethingToDo.DBModels
         public string UrlString { get; set; }
 
         public bool isStarted { get; set; }
-       
+        public int usersDone { get; set; }
         public virtual List<User> users { get; set; }
 
         public virtual List<YelpListing> yelpListings { get; set; }

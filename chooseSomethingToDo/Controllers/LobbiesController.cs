@@ -26,55 +26,12 @@ namespace chooseSomethingToDo.Controllers
             _context = context;
         }
 
-        // GET: api/Lobbies/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Lobby>> GetLobby(int id)
-        {
-            var lobby = await _context.Lobbys.FindAsync(id);
-
-            if (lobby == null)
-            {
-                return NotFound();
-            }
-
-            return lobby;
-        }
-
-       
-        // PUT: api/Lobbies/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutLobby(int id, Lobby lobby)
-        {
-            if (id != lobby.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(lobby).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LobbyExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
+        
+        
 
         [HttpPost]
-        [Route("api/createLobby")]
-        public async Task<ActionResult<Lobby>> CreateLobby([FromBody] String name)
+        [Route("createLobby")]
+        public async Task<ActionResult<Lobby>> CreateLobby()
         {
             try
             {
@@ -99,11 +56,7 @@ namespace chooseSomethingToDo.Controllers
                 lobby.UrlString = new string(result);
                 lobby.users = new List<User>();
 
-                User user = new User();
-                user.Name = name;
-                user.IsLeader = true;
-                
-                lobby.users.Add(user);
+                lobby.usersDone = 0;
                 lobby.isStarted = false;
                 _context.Lobbys.Add(lobby);
 
@@ -125,25 +78,6 @@ namespace chooseSomethingToDo.Controllers
 
 
         
-        // DELETE: api/Lobbies/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteLobby(int id)
-        {
-            var lobby = await _context.Lobbys.FindAsync(id);
-            if (lobby == null)
-            {
-                return NotFound();
-            }
-
-            _context.Lobbys.Remove(lobby);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool LobbyExists(int id)
-        {
-            return _context.Lobbys.Any(e => e.Id == id);
-        }
+       
     }
 }

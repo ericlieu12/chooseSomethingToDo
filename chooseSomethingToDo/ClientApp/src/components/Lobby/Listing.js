@@ -9,37 +9,37 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Card from '@mui/material/Card';
+
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+
 import YelpStar from './YelpStar.js';
-import YelpLogo from '../../resources/yelp_logo.png';
+
+import YelpFav from '../../resources/yelp_favicon.png';
 import Chip from '@mui/material/Chip';
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        backgroundColor: theme.palette.common.black,
-        color: theme.palette.common.white,
-    },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-    },
-}));
+
 
 const Listing = (props) => {
 
-    const { yesAnswer, noAnswer, listing } = props;
+    const { submitAnswer, listing } = props;
     const categories = listing.categoryTitleString.split(",");
+    const id = listing.id;
     const transactions = listing.transactionsString.split(",");
     categories.pop()
     transactions.pop()
+    var checkmark = '✔';
+    const answerSubmit = (value) => {
+        submitAnswer(value)
+       
+    }
     return (
-        <Card sx={{width: 300}}>
+        <Card sx={{ width: 300, height: 550, display: 'flex', flexDirection: 'column'}} >
             <CardMedia
                 component="img"
-                height="200"
+                height="225"
                 width="300"
                 image={listing.imageURL}
                 alt="green iguana"
@@ -47,16 +47,16 @@ const Listing = (props) => {
             />
             <CardContent>
                 <Typography variant="h5">
-                    {listing.name} ({listing.price})
+                   {listing.name} ({listing.price})
                 </Typography>
-                <Typography variant="body2" sx={{ mb: 0.5 }} color="text.secondary">
+                <Typography variant="body2" sx={{ mb: 0.5 }} color="#454955">
                     {listing.addressString}, {listing.city}, {listing.state} {listing.zipCode}
                 </Typography>
               
                 <Stack direction="row" spacing={2} sx={{ mb: 1 }}>
                     
                     <YelpStar rating={listing.rating} />
-                    <Typography align="center" variant="body2" color="text.secondary">
+                    <Typography align="center" variant="body2" color="#454955">
                         {listing.reviewCount} reviews
                     </Typography>
                     </Stack>
@@ -67,7 +67,7 @@ const Listing = (props) => {
                
                 {categories.map((category) => (
                    
-                    <Chip sx={{ mb: 1 }} label={category} />
+                    <Chip sx={{ mb: 1, mr: 2 }} label={category} />
 
                 ))}
 
@@ -79,9 +79,12 @@ const Listing = (props) => {
 
                 
             </CardContent>
-            <CardActions sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}} >
-                <Button size="small" variant="contained" onClick={() => yesAnswer()} >No</Button>
-                <Button align="right" size="small" variant="contained" onClick={() => noAnswer()} >Yes</Button>
+            <CardActions sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignSelf:'flexEnd', mt:'auto' }} >
+                
+                <Button size="medium" variant="contained" onClick={() => answerSubmit('no')} > X </Button>
+                <a href={listing.yelpURL} target="_blank">  <img src={YelpFav} /> </a>
+               
+                <Button align="right" size="medium" variant="contained" onClick={() => answerSubmit('yes')} > {checkmark}</Button>
             </CardActions>
         </Card>
     )

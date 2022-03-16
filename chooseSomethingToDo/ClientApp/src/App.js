@@ -10,70 +10,55 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from "react-router-dom";
 import Lobby from './components/Lobby/Lobby';
+import Home from './components/Home/Home';
 import Container from '@mui/material/Container';
 function App() {
-    const navigate = useNavigate();
-
+   
+    const theme = createTheme({
+        palette: {
+            primary: {
+                main: '#454955'
+            }
+        },
+        typography: {
+            allVariants: {
+                color: "#0D0A0B"
+            },
+        },
+    });
     //<link
     //    rel="stylesheet"
     //    href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
     ///>
    
    
-    async function createLobby() {
-        document.cookie = "userID=" + '=; Max-Age=0'
-        const response = await fetch("https://localhost:7226/api/lobbies/api/createlobby", {
-            method: 'POST',
-            headers: new Headers({
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-
-            }),
-            body: JSON.stringify("Doggie")
-        });
-        const lobby = await response.json();
-        console.log(lobby.users[0].id)
-        document.cookie = "userID=" + lobby.users[0].id;
-        navigate("/lobby/" + lobby.urlString);
-        
-    }
+    
 
 
     return (
-        <Box sx={{ height: '100vh' }} style={{overflow: 'hidden'}}>
-            <AppBar position="static" sx={{ width: '100vw' }}>
-                <Toolbar>
-                    <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="menu"
-                        sx={{ mr: 2 }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                        News
-                    </Typography>
-                    <Button color="inherit" onClick={() => createLobby()}>Create lobby</Button>
-                </Toolbar>
-            </AppBar>
+        <ThemeProvider theme={theme}>
+            <Box sx={{ height: '100vh', bgcolor: '#F3EFF5'}} style={{overflow: 'hidden'}}>
+
             <Container className="App" sx={{ mt: 5 }}>
            
          
              
-             
+       
 
                 <Routes>
-                   
-                    <Route path="/lobby" >
+                    <Route path="/" element={<Home />}/>
+                       
+                         
+                        <Route path="/lobby">
                         <Route path=":lobbyUrl" element={<Lobby />} />
+                        <Route path="*" element={<Home />} />
                         </Route>
                     
                     </Routes>
               
         </Container>
-        </Box>
+            </Box>
+            </ThemeProvider>
     )
 }
 export default App;

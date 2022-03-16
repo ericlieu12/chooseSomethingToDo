@@ -38,70 +38,8 @@ const Lobby = (props) => {
     //2 = data ready from api
     const [chosen, setChosen] = useState('');
 
-    const disconnectUser = () => {
-        if (connection) {
+ 
 
-        }
-    }
-    const getOrCreateUser = async () => {
-        let cookie = {};
-        document.cookie.split(';').forEach(function (el) {
-            let [key, value] = el.split('=');
-            cookie[key.trim()] = value;
-        })
-
-        if (cookie['userID']) {
-            try {
-                const response = await fetch("https://localhost:7226/api/users/" + cookie['userID'], {
-                    method: 'GET',
-                    headers: new Headers({
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-
-                    }),
-
-
-                });
-                const data = await response.json();
-                console.log(data);
-                setUser(data)
-            }
-            catch (ex)
-            {
-                //error
-            }
-            
-            
-        }
-        else {
-            try {
-                let user1 = prompt("Please enter your name", "Harry Potter");;
-                const response = await fetch("https://localhost:7226/api/users/createuser", {
-                    method: 'POST',
-                    headers: new Headers({
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-
-                    }),
-                    body: JSON.stringify(user1)
-                });
-                const data = await response.json();
-                console.log(data);
-                setUser(data)
-            }
-            catch (ex) {
-                //error
-            }
-        }
-       
-        
-       
-    };
-    useEffect(() => {
-      
-        getOrCreateUser()
-        
-    }, []);
     useEffect(() => {
         const newConnection = new HubConnectionBuilder()
             .withUrl('http://localhost:5226/hubs/lobby')
@@ -109,7 +47,7 @@ const Lobby = (props) => {
             .build();
 
         setConnection(newConnection);
-    }, [user])
+    }, [])
     useEffect(() => {
 
         if (connection) {
@@ -129,8 +67,9 @@ const Lobby = (props) => {
                         }
                     });
                     connection.on('ReadyLobby', message => {
-                        console.log(message)
-                        setListings(message);
+                        
+                        const shuffled = message.sort(() => Math.random() - 0.5)
+                        setListings(shuffled);
                         setLobbyState(2);
 
                     });
@@ -141,8 +80,17 @@ const Lobby = (props) => {
                         
 
                     });
+                    connection.on('UserCreated', message => {
+                        setUser(message)
+
+                    });
                     connection.on('ErrorConnection', message => {
-                        alert("Error, lobby may have started or you have been kicked. Click the back button or leave the website.")
+                        alert("Error, lobby may have started or it does not exist. Click the back button or leave the website.")
+
+
+                    });
+                    connection.on('ErrorAPI', message => {
+                        alert("Error, invalid address or Yelp is down. Try again later. If error persists, contact developer.")
 
 
                     });
@@ -151,16 +99,23 @@ const Lobby = (props) => {
                 }
                     
     }, [connection]);
+
+
+    
     const sendMessage = async () => {
-        console.log(user)
-        const chatMessage = {
+        
+        var joinLobbyMessage = {
             UrlString: params.lobbyUrl,
-            UserId: user.id,
+            
         };
+        
+        joinLobbyMessage.UserName = prompt("Please enter your name", "Harry");
+        
+        
 
         if (connection._connectionStarted) {
             try {
-                await connection.send('JoinLobby', chatMessage);
+                await connection.send('JoinLobby', joinLobbyMessage);
             }
             catch (e) {
                 console.log(e);
@@ -170,6 +125,28 @@ const Lobby = (props) => {
             alert('No connection to server yet.');
         }
     }
+
+    const sendUserDoneMessage = async () => {
+      
+        const DoneMessage = {
+            UrlString: params.lobbyUrl,
+            UserId: user.id
+        };
+        
+        setLobbyState(1)
+        if (connection._connectionStarted) {
+            try {
+                await connection.send('UserDone', DoneMessage);
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }
+        else {
+            alert('No connection to server yet.');
+        }
+    }
+
     const sendYesListing = async (value) => {
         const yesMessage = {
             UrlString: params.lobbyUrl,
@@ -217,6 +194,9 @@ const Lobby = (props) => {
             alert('No connection to server yet.');
         }
     }
+
+
+
     if (users.length == 0)
         return (
             <Backdrop
@@ -226,12 +206,19 @@ const Lobby = (props) => {
             >
                 <CircularProgress color="inherit" />
             </Backdrop>)
+
+
+
     if (lobbyState == 0)
         return(<LobbyState0
             startLobby={startLobby}
             users={users}
+            isLeader={user.isLeader}
            
         />)
+
+
+
     if (lobbyState == 1)
         return (
             <Backdrop
@@ -241,14 +228,21 @@ const Lobby = (props) => {
             >
                 <CircularProgress color="inherit" />
             </Backdrop>)
+
+
+
     if (lobbyState == 2) {
         return (
             <LobbyState2
                 connection={connection}
-            listings={listings}
-            sendYesListing={sendYesListing}
+                listings={listings}
+                sendYesListing={sendYesListing}
+                sendDoneMessage={sendUserDoneMessage}
         />)
     }
+
+
+
     if (lobbyState == 3) {
         return (
             <LobbyState3
@@ -257,11 +251,14 @@ const Lobby = (props) => {
 
             />)
     }
+
+
+
     return (
         <LobbyState0
             startLobby={startLobby}
             users={users}
-            
+            isLeader={user.isLeader}
             
         />
     )

@@ -23,32 +23,47 @@ namespace chooseSomethingToDo.Hubs
         }
         public async Task JoinLobby(JoinLobbyMessage message)
         {
-            
-            Lobby lobby = await _context.Lobbys.Include(x => x.users).FirstAsync(m => m.UrlString == message.UrlString);
-            
-            await Groups.AddToGroupAsync(Context.ConnectionId, message.UrlString);
-            if (lobby.isStarted)
+            try
             {
-                //lobby started, so error it up
-                Clients.Client(Context.ConnectionId).SendAsync("ErrorConnection");
-            }
-            else
-            {
-                User user = await _context.Users.FirstAsync(m => m.Id == message.UserId);
-                user.ConnectionID = Context.ConnectionId;
-                if (user.IsLeader)
-                {
+                Lobby lobby = await _context.Lobbys.Include(x => x.users).FirstAsync(m => m.UrlString == message.UrlString);
 
+                await Groups.AddToGroupAsync(Context.ConnectionId, message.UrlString);
+                if (lobby.isStarted)
+                {
+                    //lobby started, so error it up
+                    Clients.Client(Context.ConnectionId).SendAsync("ErrorConnection");
                 }
                 else
                 {
-                    //because they are not automatically added
-                    lobby.users.Add(user);
-                }
+                    User user = new User();
+                    user.Name = message.UserName;
+                    
+                    user.ConnectionID = Context.ConnectionId;
+                    user.IsDone = false;
 
-                await _context.SaveChangesAsync();
-                await Clients.Group(message.UrlString).SendAsync("JoinedLobby", lobby.users);
+                    if (lobby.users.Count == 0)
+                    {
+                        //assume user count 0 means the lea
+                        //assume user count 0 means the leaer is joining
+                        user.IsLeader = true;
+                    }
+                    else
+                    {
+                        user.IsLeader = false;
+
+
+                    }
+                    lobby.users.Add(user);
+                    await _context.SaveChangesAsync();
+                    await Clients.Client(Context.ConnectionId).SendAsync("UserCreated", user);
+                    await Clients.Group(message.UrlString).SendAsync("JoinedLobby", lobby.users);
+                }
             }
+            catch (Exception ex)
+            {
+                Clients.Client(Context.ConnectionId).SendAsync("ErrorConnection");
+            }
+           
             
         }
 
@@ -171,7 +186,7 @@ namespace chooseSomethingToDo.Hubs
                 }
                 catch
                 {
-
+                    await Clients.Group(message.UrlString).SendAsync("ErrorAPI", "EROR");
                 }
                
                 
@@ -189,10 +204,10 @@ namespace chooseSomethingToDo.Hubs
         {
             try
             {
-                Lobby lobby = await _context.Lobbys.Include(x => x.users).Include(x => x.yelpListings).ThenInclude(m => m.users).FirstAsync(m => m.UrlString == message.UrlString);
-
+                Lobby lobby = await _context.Lobbys.Include(x => x.users).Include(x => x.yelpListings).FirstAsync(m => m.UrlString == message.UrlString);
+                YelpListing listing = await _context.YelpListings.Include(m => m.users).FirstAsync(m => m.Id == message.YelpListingId);
                 User user = await _context.Users.FirstAsync(m => m.Id == message.UserId);
-                if (lobby.users.Contains(user) || lobby.yelpListings[message.YelpListingId].users.Contains(user))
+                if (lobby.users.Contains(user) || listing.users.Contains(user))
                 {
                 }
                 else
@@ -200,29 +215,20 @@ namespace chooseSomethingToDo.Hubs
                     throw new Exception();
                 }
 
-                lobby.yelpListings[message.YelpListingId].users.Add(user);
+                listing.users.Add(user);
+               
                 await _context.SaveChangesAsync();
-                if (lobby.yelpListings[message.YelpListingId].users.Count == lobby.users.Count)
+                if (listing.users.Count == lobby.users.Count)
                 {
-                    await Clients.Group(message.UrlString).SendAsync("ChosenLocation", lobby.yelpListings[message.YelpListingId]);
+                    await Clients.Group(message.UrlString).SendAsync("ChosenLocation", listing);
                 }
-                if ((message.YelpListingId + 1) == lobby.yelpListings.Count)
-                {
-                    int maxCountIndex = 0;
-                    int maxCount = 0;
-                    int index = 0;
-                    foreach(YelpListing listing in lobby.yelpListings)
-                    {
-                        if (listing.users.Count > maxCount)
-                        {
-                            maxCountIndex = index;
-                            maxCount = listing.users.Count;
-                        }
-                        index++;
-                    }
-                    await Clients.Group(message.UrlString).SendAsync("ChosenLocation", lobby.yelpListings[maxCountIndex]);
-                }
-                
+                //if (user.amountDone == lobby.yelpListings.Count)
+                //{
+                //    lobby.usersDone = lobby.usersDone + 1;
+                //}
+        
+               
+
             }
             catch (Exception ex)
             {
@@ -233,7 +239,52 @@ namespace chooseSomethingToDo.Hubs
 
 
         }
-        public override async Task OnDisconnectedAsync(Exception? ex)
+
+        public async Task UserDone(DoneMessage message)
+        {
+            try
+            {
+
+                Lobby lobby = await _context.Lobbys.Include(x => x.users).Include(x => x.yelpListings).ThenInclude(x => x.users).FirstAsync(m => m.UrlString == message.UrlString);
+                
+                User user = await _context.Users.FirstAsync(m => m.Id == message.UserId);
+
+                if (user.IsDone == false)
+                {
+                    user.IsDone = true;
+                    lobby.usersDone = lobby.usersDone + 1;
+                }
+                await _context.SaveChangesAsync();
+                if (lobby.usersDone == lobby.users.Count)
+                {
+                    int maxCountIndex = 0;
+                    int maxCount = 0;
+                    int index = 0;
+                    foreach (YelpListing listing in lobby.yelpListings)
+                    {
+                        if (listing.users.Count >= maxCount)
+                        {
+                            maxCountIndex = index;
+                            maxCount = listing.users.Count;
+                        }
+                        index++;
+                    }
+                    await Clients.Group(message.UrlString).SendAsync("ChosenLocation", lobby.yelpListings[maxCountIndex]);
+
+                }  
+                
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+
+
+
+        }
+        public override async Task OnDisconnectedAsync(Exception? ex) 
         {
             // Add your own code here.
             // For example: in a chat application, mark the user as offline, 
@@ -242,8 +293,18 @@ namespace chooseSomethingToDo.Hubs
             Lobby lobby = await _context.Lobbys.Include(x => x.users).FirstAsync(m => m.Id == user.LobbyId);
 
             lobby.users.Remove(user);
-            await _context.SaveChangesAsync();
-            await Clients.Group(lobby.UrlString).SendAsync("JoinedLobby", lobby.users);
+            if (lobby.users.Count == 0)
+            {
+                _context.Lobbys.Remove(lobby);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                await _context.SaveChangesAsync();
+                await Clients.Group(lobby.UrlString).SendAsync("JoinedLobby", lobby.users);
+            }
+            
+            
            
         }
 

@@ -10,6 +10,9 @@ import Paper from '@mui/material/Paper';
 import Listing from './Listing';
 import UserListState2 from './UserListState2';
 import Grid from '@mui/material/Grid';
+import CircularProgress from '@mui/material/CircularProgress';
+import Stack from '@mui/material/Stack';
+import Backdrop from '@mui/material/Backdrop';
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: theme.palette.common.black,
@@ -21,15 +24,37 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 const LobbyState2 = (props) => {
     
-    const { sendYesListing, listings } = props;
-   
+    const { sendYesListing, listings, sendDoneMessage } = props;
+     
     const [listingID, setListingID] = useState(0);
-    const yesAnswer = () => {
-        sendYesListing(listingID)
-        setListingID(listingID + 1)
+    const submitAnswer = (answer, value) => {
+        if (answer == 'yes') {
+            sendYesListing(value)
+        }
+        if (answer == 'no') {
+
+        }
+        if ((listingID + 1) == listings.length) {
+            console.log('last card reached')
+            sendDoneMessage()
+
+
+        }
+        else {
+            setListingID(listingID + 1)
+        }
+        
     }
-    const noAnswer = () => {
-        setListingID(listingID + 1)
+    
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)) {
+        console.log("Yee haw")
+        return (
+            <Stack direction="row" sx={{ height: 'calc (100vh-64px)', width: '100%' }} justifyContent="center" alignContent="center">
+                <Listing listing={listings[listingID]} submitAnswer={submitAnswer} />
+            </Stack>
+
+
+        )
     }
     return (
         <Grid container spacing={2} sx={{height: 'calc (100vh-64px)'}}>
@@ -38,7 +63,7 @@ const LobbyState2 = (props) => {
             </Grid>
             <Grid item xs={4}>
                
-                <Listing listing={listings[listingID]} yesAnswer={yesAnswer} noAnswer={noAnswer} />
+                <Listing listing={listings[listingID]} submitAnswer={submitAnswer} />
                
             </Grid>
             <Grid item xs={4}>

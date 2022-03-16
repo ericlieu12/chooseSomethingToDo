@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using chooseSomethingToDo.Database;
 
@@ -11,9 +12,10 @@ using chooseSomethingToDo.Database;
 namespace chooseSomethingToDo.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220315215347_userDone")]
+    partial class userDone
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,9 +59,6 @@ namespace chooseSomethingToDo.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDone")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsLeader")
                         .HasColumnType("bit");
 
@@ -71,6 +70,9 @@ namespace chooseSomethingToDo.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("YelpListingId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("amountDone")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
