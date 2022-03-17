@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState } from 'react';
 
 import { Link } from "react-router-dom";
 
@@ -21,7 +21,7 @@ const Home = (props) => {
         setLoading(true)
         try {
            
-            const response = await fetch("https://localhost:7226/api/lobbies/createlobby", {
+            const response = await fetch("api/lobbies/createlobby", {
                 method: 'POST',
                 headers: new Headers({
                     'Content-Type': 'application/json',

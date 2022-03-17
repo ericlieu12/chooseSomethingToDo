@@ -1,28 +1,15 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import { useParams } from "react-router-dom";
-import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+
+
 import Backdrop from '@mui/material/Backdrop';
 import LobbyState0 from './LobbyState0';
 import LobbyState2 from './LobbyState2';
+import { useNavigate } from "react-router-dom";
 import LobbyState3 from './LobbyState3';
 import CircularProgress from '@mui/material/CircularProgress';
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        backgroundColor: theme.palette.common.black,
-        color: theme.palette.common.white,
-    },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-    },
-}));
+
 const Lobby = (props) => {
     const [connection, setConnection] = useState(null);
     const [users, setUsers] = useState([]);
@@ -31,23 +18,53 @@ const Lobby = (props) => {
     
     const [listings, setListings] = useState([]);
     const [lobbyState, setLobbyState] = useState(0);
-   
+    const navigate = useNavigate();
     let params = useParams();
      //0 = lobby fresh, no start yet
     //1 = lobby started, fetch data from api
     //2 = data ready from api
     const [chosen, setChosen] = useState('');
 
- 
+
+
+
+
+
+    const checkLobbyExists = async () => {
+
+
+        const response = await fetch("/api/lobbies/" + params.lobbyUrl, {
+            method: 'GET',
+            headers: new Headers({
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+
+            }),
+
+        });
+        const lobbyExistsResponse = await response;
+        if (lobbyExistsResponse.ok == true) {
+            const newConnection = new HubConnectionBuilder()
+                .withUrl('https://choosesomethingtodo20220316232714.azurewebsites.net/hubs/lobby')
+                .withAutomaticReconnect()
+                .build();
+
+            setConnection(newConnection);
+        }
+        else {
+            errorReroute()
+        }
+       
+
+    }
 
     useEffect(() => {
-        const newConnection = new HubConnectionBuilder()
-            .withUrl('http://localhost:5226/hubs/lobby')
-            .withAutomaticReconnect()
-            .build();
-
-        setConnection(newConnection);
+        checkLobbyExists()
     }, [])
+
+
+
+
     useEffect(() => {
 
         if (connection) {
@@ -59,7 +76,7 @@ const Lobby = (props) => {
 
                     connection.on('JoinedLobby', message => {
                         setUsers(message)
-                        console.log(message)
+                       /* console.log(message)*/
                     });
                     connection.on('StartedLobby', message => {
                         if (message == "not ready") {
@@ -85,7 +102,7 @@ const Lobby = (props) => {
 
                     });
                     connection.on('ErrorConnection', message => {
-                        alert("Error, lobby may have started or it does not exist. Click the back button or leave the website.")
+                        errorReroute()
 
 
                     });
@@ -101,7 +118,11 @@ const Lobby = (props) => {
     }, [connection]);
 
 
-    
+    const errorReroute = () => {
+       
+        alert("Error, lobby may not exist or have started. Click ok to reroute back to main page.")
+        navigate("/")
+    }
     const sendMessage = async () => {
         
         var joinLobbyMessage = {
@@ -168,7 +189,9 @@ const Lobby = (props) => {
        
     }
     const startLobby = async (distance, openNow, categoriesString, price, address) => {
-        const miles = distance * 1609.34
+       
+       
+        var miles = distance * 1609.34
         if (miles > 40000) {
             miles = 40000
         }

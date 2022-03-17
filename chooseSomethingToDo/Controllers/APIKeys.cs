@@ -7,7 +7,7 @@ namespace chooseSomethingToDo.Controllers
     [ApiController]
     public class APIKeys : ControllerBase
     {
-        private const string GoogleAPIKey = "AIzaSyDxR9q2tZoGDifI8rKlhzczTdOu - jB_MEs";
+        private const string GoogleAPIKey = "AIzaSyD6RoqikX4m2kogP_MpaaNu86iEsXAntIY";
         [HttpGet]
         public async Task<ActionResult<String>> GetAPIKeys()
         {

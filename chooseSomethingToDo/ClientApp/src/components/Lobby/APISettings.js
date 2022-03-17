@@ -1,17 +1,10 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
+
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import UserCard from '../SharedLobbyComponents/UserCard.js';
+
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import Grid from '@mui/material/Grid';
+
 import Slider from '@mui/material/Slider';
 import EditIcon from '@mui/icons-material/Edit';
 import Radio from '@mui/material/Radio';
@@ -21,7 +14,7 @@ import FormLabel from '@mui/material/FormLabel';
 import IconButton from '@material-ui/core/IconButton';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
-import UserList from '../SharedLobbyComponents/UserList';
+
 import FormControlLabel from '@mui/material/FormControlLabel';
 
 
@@ -56,7 +49,7 @@ const APISettings = (props) => {
         
             let lat = position.coords.latitude // You have obtained latitude coordinate!
             let lon = position.coords.longitude // You have obtained longitude coordinate!
-            const response = await fetch("https://localhost:7226/googleapikeys", {
+            const response = await fetch("/googleapikeys", {
                 method: 'GET',
                 headers: new Headers({
                     'Content-Type': 'application/json',
@@ -66,8 +59,8 @@ const APISettings = (props) => {
 
 
             });
-        const apiKey = 'AIzaSyD6RoqikX4m2kogP_MpaaNu86iEsXAntIY'
-        console.log(apiKey)
+        const apiKey = await response.json()
+        /*console.log(apiKey)*/
         const addressResponse = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${apiKey}`)
             const addressString = await addressResponse.json();
             setAddress(addressString.results[0].formatted_address)
@@ -76,7 +69,7 @@ const APISettings = (props) => {
         
     }
     const enterAddress = async () => {
-        const response = await fetch("https://localhost:7226/googleapikeys", {
+        const response = await fetch("/googleapikeys", {
             method: 'GET',
             headers: new Headers({
                 'Content-Type': 'application/json',
@@ -86,15 +79,19 @@ const APISettings = (props) => {
 
 
         });
-        const apiKey = 'AIzaSyD6RoqikX4m2kogP_MpaaNu86iEsXAntIY'
-        const tempAddress = prompt("Please enter your address (128 Test Street, Town, State ZIP)", "128 Test Street, Test Town, EE 01234");
+        const apiKey = await response.json()
+        const tempAddress = prompt("Please enter a valid address (128 Test Street, Town, State ZIP)", "128 Test Street, Test Town, EE 01234");
         const addressResponse = await fetch(`https://maps.google.com/maps/api/geocode/json?key=${apiKey}&address=${tempAddress}`)
         const addressString = await addressResponse.json();
         if (addressString.status == 'OK') {
             setAddress(tempAddress)
         }
         else {
-            enterAddress()
+            if (tempAddress == null) {
+                            }
+            else {
+                enterAddress()
+            }
         }
       
     };
@@ -132,7 +129,9 @@ const APISettings = (props) => {
 
                 var newString = categoriesString.replace((',' + value), '')
                 newString = newString.replace((value), '')
-
+                if (newString.charAt(0) == ',') {
+                    newString = newString.substring(1, newString.length - 1)
+                }
                 setCategoriesString(newString)
 
 

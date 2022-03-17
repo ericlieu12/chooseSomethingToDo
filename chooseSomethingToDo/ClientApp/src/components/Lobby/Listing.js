@@ -32,7 +32,7 @@ const Listing = (props) => {
     transactions.pop()
     var checkmark = '✔';
     const answerSubmit = (value) => {
-        submitAnswer(value)
+        submitAnswer(value, id)
        
     }
     return (

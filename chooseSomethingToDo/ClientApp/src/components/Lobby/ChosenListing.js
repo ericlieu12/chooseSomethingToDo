@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React from 'react';
 
 
 import Stack from '@mui/material/Stack';
@@ -6,13 +6,13 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
+
 import Typography from '@mui/material/Typography';
 
 import YelpStar from './YelpStar.js';
-
+import YelpFav from '../../resources/yelp_favicon.png';
 import Chip from '@mui/material/Chip';
-
+import DirectionsIcon from '@mui/icons-material/Directions';
 
 const ChosenListing = (props) => {
 
@@ -21,6 +21,7 @@ const ChosenListing = (props) => {
     const transactions = listing.transactionsString.split(",");
     categories.pop()
     transactions.pop()
+    const url = "https://www.google.com/maps/place/" +  listing.addressString  + "," +  listing.city  + "," +  listing.state  + "," +  listing.zipCode 
     return (
         <Card sx={{ width: 300 }}>
             <CardMedia
@@ -66,9 +67,9 @@ const ChosenListing = (props) => {
 
             </CardContent>
             <CardActions sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }} >
-                <Button size="small" variant="contained"  >No</Button>
-     
-                <Button align="right" size="small" variant="contained"  >Yes</Button>
+                <a href={listing.yelpURL} target="_blank">  <img src={YelpFav} /> </a>
+                <a href={url} target="_blank"> <DirectionsIcon style={{fontSize: 55}} /> </a>
+                
             </CardActions>
         </Card>
     )

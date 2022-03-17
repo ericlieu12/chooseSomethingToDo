@@ -1,41 +1,21 @@
-﻿import React, { useState, useEffect } from 'react';
-import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
+﻿import React from 'react';
+
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import UserCard from '../SharedLobbyComponents/UserCard.js';
+
 import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
+
 import Grid from '@mui/material/Grid';
-import Slider from '@mui/material/Slider';
-import EditIcon from '@mui/icons-material/Edit';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
-import IconButton from '@material-ui/core/IconButton';
-import Checkbox from '@mui/material/Checkbox';
-import FormGroup from '@mui/material/FormGroup';
+
 import UserList from '../SharedLobbyComponents/UserList';
 
-import FormControlLabel from '@mui/material/FormControlLabel';
+
 import APISettings from './APISettings.js';
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        backgroundColor: theme.palette.common.black,
-        color: theme.palette.common.white,
-    },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-    },
-}));
+
 const LobbyState0 = (props) => {
-    
+    const copyLink = () => {
+        navigator.clipboard.writeText(window.location.href)
+        alert("Link copied")
+    }
     const { startLobby, users, isLeader} = props;
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)) {
         return (
@@ -70,7 +50,7 @@ const LobbyState0 = (props) => {
 
 
                 </Grid>
-                <Grid item xs={12}>  <Button sx={{ width: '100%' }} style={{ backgroundColor: '#454955', color: '#F3EFF5', borderRadius: 8, padding: 5 }} > Copy Link </Button> </Grid>
+                <Grid item xs={12}>  <Button onClick={() => copyLink()} sx={{ width: '100%' }} style={{ backgroundColor: '#454955', color: '#F3EFF5', borderRadius: 8, padding: 5 }} > Copy Link </Button> </Grid>
             </Grid>
         )
     }
@@ -108,7 +88,7 @@ const LobbyState0 = (props) => {
                
 
             </Grid> 
-            <Grid item xs={12}>  <Button sx={{ width: '100%' }} style={{ backgroundColor: '#454955', color: '#F3EFF5', borderRadius: 8, padding: 5 }} > Copy Link </Button> </Grid>
+            <Grid item xs={12}>  <Button sx={{ width: '100%' }} style={{ backgroundColor: '#454955', color: '#F3EFF5', borderRadius: 8, padding: 5 }} onClick={() => copyLink()}> Copy Link </Button> </Grid>
         </Grid>
           
               

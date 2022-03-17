@@ -25,9 +25,27 @@ namespace chooseSomethingToDo.Controllers
         {
             _context = context;
         }
+        [HttpGet("{url}")]
+        
+        public async Task<ActionResult<String>> GetLobby(string url) 
+        {
+            try
+            {
+                Lobby lobby = await _context.Lobbys.FirstAsync(e => e.UrlString == url);
+                if (lobby == null)
+                {
+                    throw new Exception();
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return NotFound();
+            }
+           
+           
+        }
 
-        
-        
 
         [HttpPost]
         [Route("createLobby")]
@@ -67,7 +85,7 @@ namespace chooseSomethingToDo.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound();
+                return CreatedAtAction("CreateLobby", ex);
             }
             
         }
