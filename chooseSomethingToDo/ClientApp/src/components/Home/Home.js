@@ -36,7 +36,7 @@ const Home = (props) => {
             navigate("/lobby/" + lobby.urlString);
         }
         catch (ex) {
-            console.log(ex)
+            alert("Failed to create lobbby. Wait a few seconds and try again or refresh the page.")
         }
 
     }
@@ -74,11 +74,11 @@ const Home = (props) => {
             </Stack>
             <Stack>
             <Typography  align="center" variant="body2" >
-                Any suggestions, email me at ericlieu118@gmail.com. Version 1.0, created with React, .NET Core, and SignalR. 
+                Any suggestions or bugs, email me at ericlieu118@gmail.com. Version 1.0, created with React, .NET Core, and SignalR.  
                 </Typography>
                 <Typography align="center" variant="body2" >
                     Check out how I built this and my future planned updates here:
-                    <Link to="https://docs.google.com/document/d/1m7E9Fm37ayJGF88pLDqmkJlLfShcEpcvd-4BHPFumQ0/edit?usp=sharing">Google Doc </Link>
+                    <a href="https://docs.google.com/document/d/1m7E9Fm37ayJGF88pLDqmkJlLfShcEpcvd-4BHPFumQ0/edit?usp=sharing">Google Doc </a>
                 </Typography>
            </Stack>
             

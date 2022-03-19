@@ -26,7 +26,7 @@ namespace chooseSomethingToDo.Controllers
             _context = context;
         }
         [HttpGet("{url}")]
-        
+  
         public async Task<ActionResult<String>> GetLobby(string url) 
         {
             try

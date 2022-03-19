@@ -34,7 +34,7 @@ function App() {
 
     return (
         <ThemeProvider theme={theme}>
-            <Box sx={{ minHeight: '100vh', bgcolor: '#F3EFF5', overflow: 'auto'}} >
+            <Box sx={{ minHeight: '100vh', overflow: 'auto'}} >
 
            
          

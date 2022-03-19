@@ -16,7 +16,8 @@ const LobbyState0 = (props) => {
         navigator.clipboard.writeText(window.location.href)
         alert("Link copied")
     }
-    const { startLobby, users, isLeader} = props;
+    const { startLobby, users, isLeader } = props;
+    navigator.clipboard.writeText(window.location.href)
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)) {
         return (
 
@@ -27,7 +28,9 @@ const LobbyState0 = (props) => {
                     </Typography>
 
                 </Grid>
+                <Grid item xs={12}>  <Button onClick={() => copyLink()} sx={{ width: '100%' }} style={{ backgroundColor: '#454955', color: '#F3EFF5', borderRadius: 8, padding: 5 }} > Copy Link </Button> </Grid>
                 <Grid item xs={12}>
+
                     <APISettings startLobby={startLobby} isLeader={isLeader} />
 
 
@@ -75,11 +78,13 @@ const LobbyState0 = (props) => {
                 <UserList users={users}/>
                 
                 </Grid>
+
             <Grid item xs={4}>
                 <APISettings startLobby={startLobby} isLeader={isLeader} />
 
 
             </Grid>
+
             <Grid item xs={12}>
                 <Typography variant="body2" align="center" component="div">
                     Copy the link and share with your friends! The leader can change settings how he pleases.

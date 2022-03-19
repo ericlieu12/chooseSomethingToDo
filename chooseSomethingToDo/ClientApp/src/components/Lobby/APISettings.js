@@ -25,6 +25,7 @@ const APISettings = (props) => {
     const [price, setPrice] = useState(4)
     const [address, setAddress] = useState('3501 W Rolling Hills Circle, Davie, FL 33328');
     const [categoriesString, setCategoriesString] = useState('restaurants')
+    
     const getLocationData = () => {
         if (navigator.geolocation) {
 
@@ -96,8 +97,12 @@ const APISettings = (props) => {
       
     };
     useEffect(() => {
-
-        getLocationData()
+        if (props.isLeader == true) {
+            getLocationData()
+        }
+        else {
+            
+        }
 
     }, []);
     const handleSliderChange = (event) => {
@@ -112,10 +117,12 @@ const APISettings = (props) => {
             }
             else {
                 var newString = categoriesString + "," + value
+                
                 if (newString.charAt(0) == ',') {
 
-                    newString = newString.substring(1, newString.length - 1)
+                    newString = newString.substring(1, newString.length)
                 }
+                console.log(newString)
                 setCategoriesString(newString)
 
             }
@@ -130,8 +137,9 @@ const APISettings = (props) => {
                 var newString = categoriesString.replace((',' + value), '')
                 newString = newString.replace((value), '')
                 if (newString.charAt(0) == ',') {
-                    newString = newString.substring(1, newString.length - 1)
+                    newString = newString.substring(1, newString.length)
                 }
+                console.log(newString)
                 setCategoriesString(newString)
 
 
@@ -142,7 +150,7 @@ const APISettings = (props) => {
     const handlePriceChange = (event) => {
 
 
-        setPrice(event.target.value)
+        setPrice(parseInt(event.target.value))
 
     };
     if (props.isLeader) {
@@ -205,57 +213,7 @@ const APISettings = (props) => {
     }
     else {
         return (
-            <Stack direction='column' spacing={2}>
-                <FormControl>
-                    <FormLabel>Location</FormLabel>
-                    <Stack direction='row'>
-                        <Typography variant="body2" >
-                            {address}
-                        </Typography>
-                        <IconButton disabled>
-                            <EditIcon sx={{ fontSize: 12 }} />
-                        </IconButton>
-                    </Stack>
-                    <FormLabel>Categories</FormLabel>
-                    <FormGroup sx={{ ml: 2 }}>
-                        <FormControlLabel  disabled onChange={(event) => handleCheckBoxChange(event, "restaurants")} control={<Checkbox defaultChecked />} labelPlacement="end" label="Restaurants" />
-                        <FormControlLabel  disabled onChange={(event) => handleCheckBoxChange(event, "active")} control={<Checkbox />} labelPlacement="end" label="Active Life" />
-                        <FormControlLabel  disabled onChange={(event) => handleCheckBoxChange(event, "arts")} control={<Checkbox />} labelPlacement="end" label="Arts & Entertainment" />
-
-                        <FormControlLabel disabled onChange={(event) => handleCheckBoxChange(event, "beautysvc")} control={<Checkbox />} labelPlacement="end" label="Beauty & Spas" />
-                        <FormControlLabel disabled onChange={(event) => handleCheckBoxChange(event, "food")} control={<Checkbox />} labelPlacement="end" label="Food" />
-                        <FormControlLabel disabled onChange={(event) => handleCheckBoxChange(event, "nightlife")} control={<Checkbox />} labelPlacement="end" label="Nightlife " />
-
-                    </FormGroup>
-
-                    <FormLabel>Open Now</FormLabel>
-                    <FormGroup sx={{ ml: 2 }}>
-                        <FormControlLabel disabled onChange={(event) => handleCheckBoxChange(event, "openNow")} control={<Checkbox defaultChecked />} labelPlacement="end" label="Open Now" />
-
-
-                    </FormGroup>
-
-                    <FormLabel>Distance (min: 1 mile, max: 25 miles)</FormLabel>
-
-
-                    <Slider disabled defaultValue={5} min={1} max={25} aria-label="Default" onChange={handleSliderChange} valueLabelDisplay="auto" />
-
-                    <FormLabel id="demo-radio-buttons-group-label">Max Price</FormLabel>
-                    <RadioGroup  sx={{ ml: 2 }} align="right"
-                        aria-labelledby="demo-radio-buttons-group-label"
-                        defaultValue="4"
-                        name="radio-buttons-group"
-                        onChange={handlePriceChange}
-                    >
-                        <FormControlLabel disabled value="1" control={<Radio />} label="$" />
-                        <FormControlLabel disabled value="2" control={<Radio />} label="$$" />
-                        <FormControlLabel disabled value="3" control={<Radio />} label="$$$" />
-                        <FormControlLabel disabled value="4" control={<Radio />} label="$$$$" />
-                    </RadioGroup>
-
-                </FormControl>
-                <Button style={{ backgroundColor: '#454955', color: '#F3EFF5', fontSize: 20, borderRadius: 16, padding: 10 }} variant="contained" disabled onClick={() => startLobby(distance, openNow, categoriesString, price, address)}> Start Lobby </Button>
-            </Stack>
+           <Stack> </Stack>
         )
     }
    
